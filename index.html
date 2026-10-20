@@ -1,0 +1,36 @@
+      const maxX = parent.clientWidth - btn.offsetWidth;
+      const maxY = parent.clientHeight - btn.offsetHeight;
+      const randX = Math.floor(Math.random() * maxX);
+      const randY = Math.floor(Math.random() * maxY);
+      btn.style.transform = `translate(${randX}px, ${randY}px)`;
+    }
+    function showConfetti() {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      for (let i = 0; i < 100; i++) {
+        const dot = document.createElement('span');
+        const hue = Math.floor(Math.random() * 360);
+        dot.style.background = `hsl(${hue}, 80%, 60%)`;
+        dot.style.left = Math.random() * 100 + 'vw';
+        dot.style.top = Math.random() * -20 + 'vh';
+        dot.style.animationDelay = Math.random() * 1.5 + 's';
+        confetti.appendChild(dot);
+      }
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 3000);
+    }
+    function renderFinal() {
+      app.innerHTML = '';
+      const card = document.createElement('div');
+      card.className = 'card bg-white rounded-xl shadow-lg p-6 text-charcoal flex flex-col items-center gap-4';
+      const title = document.createElement('h2');
+      title.className = 'text-2xl font-title';
+      title.textContent = 'Best mom & best friend in the world. Love you, Yoyo. Come give me a hug.';
+      card.appendChild(title);
+      app.appendChild(card);
+    }
+    // Start
+    renderCard(0);
+  </script>
+</body>
+</html>

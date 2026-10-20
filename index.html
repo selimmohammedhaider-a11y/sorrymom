@@ -1,9 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#FAF8F5]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yoyo Apology Card</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind config for custom colors & fonts
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#FAF8F5',
+            charcoal: '#221F1D',
+            terracotta: '#C9745E',
+            olive: '#6D7D35',
+          },
+          fontFamily: {
+            title: ['"Playfair Display"', 'serif'],
+            body: ['"Inter"', 'system-ui'],
+          },
+        },
+      },
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    .card { max-width: 420px; }
+    .runaway {
+      position: relative;
+      transition: transform 0.2s;
+    }
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .confetti span {
+      position: absolute;
+      display: block;
+      width: 8px;
+      height: 8px;
+      background: rgba(255,0,0,0.8);
+      animation: fall 1.5s linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+  <div id="app" class="w-full flex flex-col items-center space-y-6">
+    <!-- Cards will be injected here -->
+  </div>
+
+  <script>
+    const cards = [
+      {
+        title: "Hey Yoyo... ❤️",
+        text: "I know you caught me, and I know you’re upset. Before we talk, please just tap through this for 30 seconds because you’re not just my mom—you’re literally my best friend.",
+        button: "Okay, show me →",
+        next: 1,
+      },
+      {
+        title: "First: I am really, truly sorry.",
+        text: "I hate the way you found out, and I hate that I made you worry or feel disappointed in me. Wallahy العظيم I don’t do it a lot at all. It’s not a heavy habit or something I’m hooked on, I swear to you.",
+        button: "Keep reading →",
+        next: 2,
+      },
+      {
+        title: "Why I’m Not Making a Fake Promise",
+        text: "Because you’re my best friend, I refuse to lie to your face just to get out of trouble. I’m not going to promise you that I will 100% never do it again, because I want my word to actually mean something to you. **Bess wallahy**, here is what I AM promising you today: zero sneaking around, zero hiding, and if I ever even think about doing it next time, I will come talk to you and ask you first.",
+        button: "My Deal With You →",
+        next: 3,
+      },
+      {
+        title: "The Yoyo Best-Friend Pact 🤝",
+        checkboxes: [
+          "Wallahy I barely do it (no addiction).",
+          "No lying or hiding things behind your back ever again.",
+          "Next time, I ask Yoyo first—no secrets.",
+        ],
+        button: "Final Question →",
+        next: 4,
+        unlockWhenChecked: true,
+      },
+      {
+        title: "Are we good, Yoyo?",
+        text: "I’m really sorry. Can we hug it out?",
+        buttons: [
+          { label: "I forgive you ❤️", action: "forgive" },
+          { label: "Still mad at you 😠", action: "mad" },
+        ],
+      },
+    ];
+
+    const app = document.getElementById('app');
+    let current = 0;
+    let checked = [false, false, false];
+
+    function renderCard(idx) {
+      app.innerHTML = '';
+      const card = cards[idx];
+      const container = document.createElement('div');
+      container.className = 'card bg-white rounded-xl shadow-lg p-6 text-charcoal flex flex-col gap-4';
+
+      const title = document.createElement('h2');
+      title.className = 'text-2xl font-title text-charcoal';
+      title.textContent = card.title;
+      container.appendChild(title);
+
+      if (card.text) {
+        const p = document.createElement('p');
+        p.className = 'text-base font-body text-charcoal';
+        p.innerHTML = card.text; // may contain bold markup
+        container.appendChild(p);
+      }
+
+      if (card.checkboxes) {
+        const form = document.createElement('div');
+        form.className = 'flex flex-col gap-2';
+        card.checkboxes.forEach((label, i) => {
+          const id = `chk-${i}`;
+          const wrapper = document.createElement('label');
+          wrapper.className = 'inline-flex items-center space-x-2 cursor-pointer';
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.id = id;
+          cb.className = 'form-checkbox h-5 w-5 text-terracota';
+          cb.addEventListener('change', (e) => {
+            checked[i] = e.target.checked;
+            const allChecked = checked.every(Boolean);
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) nextBtn.disabled = !allChecked;
+          });
+          const span = document.createElement('span');
+          span.className = 'font-body text-charcoal';
+          span.textContent = label;
+          wrapper.appendChild(cb);
+          wrapper.appendChild(span);
+          form.appendChild(wrapper);
+        });
+        container.appendChild(form);
+      }
+
+      const btnContainer = document.createElement('div');
+      btnContainer.className = 'mt-4 flex justify-center';
+
+      if (card.button) {
+        const btn = document.createElement('button');
+        btn.id = 'nextBtn';
+        btn.textContent = card.button;
+        btn.className = 'px-4 py-2 bg-terracotta text-white rounded-md font-body disabled:opacity-50';
+        btn.disabled = card.unlockWhenChecked ?? false;
+        btn.addEventListener('click', () => renderCard(card.next));
+        btnContainer.appendChild(btn);
+      } else if (card.buttons) {
+        card.buttons.forEach(b => {
+          const btn = document.createElement('button');
+          btn.textContent = b.label;
+          btn.className = b.action === 'mad' ? 'runaway px-4 py-2 bg-olive text-white rounded-md font-body' : 'px-4 py-2 bg-terracotta text-white rounded-md font-body mr-2';
+          if (b.action === 'forgive') {
+            btn.addEventListener('click', () => {
+              showConfetti();
+              renderFinal();
+            });
+          } else if (b.action === 'mad') {
+            btn.addEventListener('mouseenter', moveButton);
+            btn.addEventListener('click', moveButton);
+          }
+          btnContainer.appendChild(btn);
+        });
+      }
+
+      container.appendChild(btnContainer);
+      app.appendChild(container);
+    }
+
+    function moveButton(e) {
+      const btn = e.currentTarget;
+      const parent = btn.parentElement;
       const maxX = parent.clientWidth - btn.offsetWidth;
       const maxY = parent.clientHeight - btn.offsetHeight;
       const randX = Math.floor(Math.random() * maxX);
       const randY = Math.floor(Math.random() * maxY);
       btn.style.transform = `translate(${randX}px, ${randY}px)`;
     }
+
     function showConfetti() {
       const confetti = document.createElement('div');
       confetti.className = 'confetti';
@@ -19,6 +208,7 @@
       document.body.appendChild(confetti);
       setTimeout(() => confetti.remove(), 3000);
     }
+
     function renderFinal() {
       app.innerHTML = '';
       const card = document.createElement('div');
@@ -29,6 +219,7 @@
       card.appendChild(title);
       app.appendChild(card);
     }
+
     // Start
     renderCard(0);
   </script>
